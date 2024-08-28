@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -16,6 +16,7 @@ import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
+import NotFound from './pages/NotFound';
 import LoginPage from './pages/Authentication/SignIn'; // Asegúrate de que esta importación esté correcta
 import { useAuth } from './context/AuthContext';
 
@@ -24,8 +25,10 @@ function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
 
+
   useEffect(() => {
     window.scrollTo(0, 0);
+
   }, [pathname]);
 
   useEffect(() => {
@@ -40,11 +43,10 @@ function App() {
   if (!user) {
     return <LoginPage/>
   }
-
   return (
     <DefaultLayout>
       <Routes>
-      <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<SignIn />} />
         
         <Route
           index
@@ -55,6 +57,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/calendar"
           element={
@@ -64,6 +67,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/profile"
           element={
@@ -73,6 +77,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/forms/form-elements"
           element={
@@ -82,6 +87,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/forms/form-layout"
           element={
@@ -91,6 +97,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/tables"
           element={
@@ -100,6 +107,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/settings"
           element={
@@ -109,6 +117,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/chart"
           element={
@@ -118,6 +127,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/ui/alerts"
           element={
@@ -127,6 +137,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/ui/buttons"
           element={
@@ -136,6 +147,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/auth/signin"
           element={
@@ -145,6 +157,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/auth/signup"
           element={
@@ -154,10 +167,13 @@ function App() {
             </>
           }
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </DefaultLayout>
   );
 }
+
 export default App;
 
  

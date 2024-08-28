@@ -1,21 +1,26 @@
 
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const SignIn: React.FC = () => {
-  const { login } = useAuth();
+  const { login, error, user } = useAuth();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();  // Inicializa el hook
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     try {
+
+      //console.log(email,password);
       await login(email, password);
+      navigate('/');  // Redirige a la página principal
+       console.log(user)
       // Aquí podrías redirigir al usuario a otra página después del login
     } catch (e) {
-      setError('Credenciales inválidas');
+       console.error(e);
     }
   };
   return (
@@ -149,10 +154,11 @@ const SignIn: React.FC = () => {
 
                 <div className="mt-6 text-center">
                   <p>
-                  {error && <p>{error}</p>}
-                    <Link to="/" className="text-primary">
-                      Ingresar
-                    </Link>
+                  {error && <p style={{ color: 'red' }}>{error}</p>}
+                    
+                  
+                      
+                    
                   </p>
                 </div>
               </form>

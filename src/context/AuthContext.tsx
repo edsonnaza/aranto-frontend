@@ -1,7 +1,8 @@
 import  { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import axios from 'axios';
 
-const URL = import.meta.env.VITE_URL_BACKEND;
+//const URL = import.meta.env.VITE_URL_BACKEND;
+const URL = import.meta.env.VITE_LOCALURL_BACKEND;
 
 interface User {
   name: string;
@@ -13,6 +14,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  error:string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,12 +22,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    const userLocalStorage   = localStorage.getItem('User') 
+    if (token && userLocalStorage) {
       // Aquí podrías hacer una solicitud para validar el token y obtener al usuario
-      setUser({ name: 'Usuario Ejemplo' });
+      const parsedUser: User = JSON.parse(userLocalStorage);
+      setUser(parsedUser);
     }
     setLoading(false);
   }, []);
@@ -36,10 +41,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { token, user } = response.data;
 
       localStorage.setItem('token', token);
+      localStorage.setItem('User',user)
       setUser(user); // Ajusta esto según lo que devuelva tu API
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      // Aquí podrías manejar errores específicos, como mostrar un mensaje al usuario
+      
+    } catch (error:any) {
+      if (error.response && error.response.data) {
+        setError(error.response.data.message)
+        console.error('Error al iniciar sesión:', error.response.data.message);
+
+      } else {
+        console.error('Error desconocido:', error);
+      }
     }
   };
 
@@ -49,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login,logout}}>
       {children}
     </AuthContext.Provider>
   );
