@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -16,8 +16,11 @@ import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
+import LoginPage from './pages/Authentication/SignIn'; // Asegúrate de que esta importación esté correcta
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
 
@@ -29,11 +32,20 @@ function App() {
     setTimeout(() => setLoading(false), 1000);
   }, []);
 
-  return loading ? (
-    <Loader />
-  ) : (
+  if (loading || authLoading) {
+    return <Loader />;
+  }
+
+  // Si el usuario no está autenticado, redirigir al login
+  if (!user) {
+    return <LoginPage/>
+  }
+
+  return (
     <DefaultLayout>
       <Routes>
+      <Route path="/login" element={<LoginPage />} />
+        
         <Route
           index
           element={
@@ -146,5 +158,6 @@ function App() {
     </DefaultLayout>
   );
 }
-
 export default App;
+
+ 
