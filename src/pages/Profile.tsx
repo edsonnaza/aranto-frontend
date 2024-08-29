@@ -1,9 +1,49 @@
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import CoverOne from '../images/cover/cover-01.png';
-import userSix from '../images/user/user-06.png';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
 
 const Profile = () => {
+const {user}= useAuth()
+const [selectedImage, setSelectedImage] = useState(null);
+const [profileImage, setProfileImage] = useState(user?.avatar);
+
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  setSelectedImage(file);
+
+  // Preview the selected image before uploading
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setProfileImage(reader.result);
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleImageUpload = async () => {
+  const formData = new FormData();
+  formData.append('avatar', selectedImage);
+  const token = localStorage.getItem('token');
+  try {
+    const response = await fetch('/api/upload-avatar', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`, // Agrega el token de autenticación si es necesario
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setProfileImage(data.avatar); // Actualiza la imagen con la nueva URL desde el backend
+    } else {
+      console.error('Error al subir la imagen');
+    }
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+  }
+};
   return (
     <>
       <Breadcrumb pageName="Profile" />
@@ -44,14 +84,14 @@ const Profile = () => {
                   />
                 </svg>
               </span>
-              <span>Edit</span>
+              <span>Editar</span>
             </label>
           </div>
         </div>
         <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
             <div className="relative drop-shadow-2">
-              <img src={userSix} alt="profile" />
+              <img src={profileImage} alt="profile" />
               <label
                 htmlFor="profile"
                 className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
@@ -88,9 +128,9 @@ const Profile = () => {
           </div>
           <div className="mt-4">
             <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
-              Danish Heilium
+            {user?.user_name } {' '} {user?.user_lastname}
             </h3>
-            <p className="font-medium">Ui/Ux Designer</p>
+            <p className="font-medium">{user?.roles}</p>
             <div className="mx-auto mt-4.5 mb-5.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F]">
               <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
                 <span className="font-semibold text-black dark:text-white">
@@ -102,19 +142,19 @@ const Profile = () => {
                 <span className="font-semibold text-black dark:text-white">
                   129K
                 </span>
-                <span className="text-sm">Followers</span>
+                <span className="text-sm">Seguidores</span>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 px-4 xsm:flex-row">
                 <span className="font-semibold text-black dark:text-white">
                   2K
                 </span>
-                <span className="text-sm">Following</span>
+                <span className="text-sm">Siguiendo</span>
               </div>
             </div>
 
             <div className="mx-auto max-w-180">
               <h4 className="font-semibold text-black dark:text-white">
-                About Me
+                Sobre Mi
               </h4>
               <p className="mt-4.5">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -127,7 +167,7 @@ const Profile = () => {
 
             <div className="mt-6.5">
               <h4 className="mb-3.5 font-medium text-black dark:text-white">
-                Follow me on
+                Sigueme en
               </h4>
               <div className="flex items-center justify-center gap-3.5">
                 <Link

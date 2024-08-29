@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
-import UserOne from '../../images/user/user-01.png';
 import { useAuth } from '../../context/AuthContext';
 
 const DropdownUser = () => {
@@ -92,7 +91,7 @@ const DropdownUser = () => {
                     fill=""
                   />
                 </svg>
-                My Contacts
+               Mis Contactos
               </Link>
             </li>
             <li>
@@ -117,7 +116,7 @@ const DropdownUser = () => {
                     fill=""
                   />
                 </svg>
-                Account Settings
+                Mis Ajustes
               </Link>
             </li>
           </ul>
