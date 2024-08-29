@@ -5,9 +5,15 @@ import axios from 'axios';
 const URL = import.meta.env.VITE_LOCALURL_BACKEND;
 
 interface User {
-  name: string;
-  // Puedes agregar más campos si es necesario
+  usuario_id: string;
+  user_name: string;
+  user_lastname: string;
+  email: string;
+  roles: string;
+  inactivo: boolean;
+  avatar:string;
 }
+
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +32,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const userLocalStorage   = localStorage.getItem('User') 
+    // Recuperar y analizar un JSON desde localStorage
+    //const userString = localStorage.getItem('user');
+   // const userLocalStorage = JSON.parse(userString);
+    const userLocalStorage   = localStorage.getItem('user') 
     if (token && userLocalStorage) {
       // Aquí podrías hacer una solicitud para validar el token y obtener al usuario
       const parsedUser: User = JSON.parse(userLocalStorage);
@@ -38,10 +47,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post(`${URL}/login`, { email, password });
-      const { token, user } = response.data;
-
-      localStorage.setItem('token', token);
-      localStorage.setItem('User',user)
+      const { accessToken, user } = response.data;
+      //console.log('user en AuthContext', user)
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('user', JSON.stringify(user));
       setUser(user); // Ajusta esto según lo que devuelva tu API
       
     } catch (error:any) {
@@ -57,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
   };
 

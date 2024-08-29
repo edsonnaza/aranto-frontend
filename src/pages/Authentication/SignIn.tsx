@@ -2,11 +2,13 @@
 import { useNavigate } from 'react-router-dom'; 
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import Loader from '../../common/Loader';
 
 const SignIn: React.FC = () => {
   const { login, error, user } = useAuth();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [buttonDisabled,setButtonDisabled]=useState<boolean>(false)
   const navigate = useNavigate();  // Inicializa el hook
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -15,12 +17,19 @@ const SignIn: React.FC = () => {
     try {
 
       //console.log(email,password);
-      await login(email, password);
-      navigate('/');  // Redirige a la página principal
-       console.log(user)
+      setButtonDisabled(true)
+     await login(email, password);
+      
+     if(user){
+
+       navigate('/');  // Redirige a la página principal
+     }
+     
+       
+       setButtonDisabled(false)
       // Aquí podrías redirigir al usuario a otra página después del login
     } catch (e) {
-       console.error(e);
+      //console.error(e)
     }
   };
   return (
@@ -111,11 +120,15 @@ const SignIn: React.FC = () => {
                   <input
                     type="submit"
                     value="Ingresar"
-                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
+                    disabled={buttonDisabled}
+                    className="active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300  disabled:opacity-40 enabled:hover:border-gray-400  w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
                   />
+                  
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50">
+                <button className="flex w-full items-center justify-center gap-3.5 rounded-lg border border-stroke bg-gray p-4 hover:bg-opacity-50 dark:border-strokedark dark:bg-meta-4 dark:hover:bg-opacity-50"
+              
+                >
                   <span>
                     <svg
                       width="20"
