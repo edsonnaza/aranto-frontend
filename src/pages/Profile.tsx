@@ -3,47 +3,72 @@ import CoverOne from '../images/cover/cover-01.png';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
+import axios from '../utils/axiosConfig'
 
 const Profile = () => {
-const {user}= useAuth()
-const [selectedImage, setSelectedImage] = useState(null);
+const {user,setUser}= useAuth()
 const [profileImage, setProfileImage] = useState(user?.avatar);
+ 
 
-const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  setSelectedImage(file);
+const handleProfileChange = async (event: any) => {
+  const file = event.target.files[0];
+  if (file) {
+    // Muestra la nueva imagen en el frontend
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setProfileImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  
 
-  // Preview the selected image before uploading
-  const reader = new FileReader();
-  reader.onloadend = () => {
-    setProfileImage(reader.result);
-  };
-  reader.readAsDataURL(file);
-};
-
-const handleImageUpload = async () => {
-  const formData = new FormData();
-  formData.append('avatar', selectedImage);
-  const token = localStorage.getItem('token');
-  try {
-    const response = await fetch('/api/upload-avatar', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`, // Agrega el token de autenticación si es necesario
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setProfileImage(data.avatar); // Actualiza la imagen con la nueva URL desde el backend
+    // Envía la imagen al backend
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    // Verifica que user y usuario_id existan y conviértelos a cadena
+    if (user?.usuario_id) {
+      formData.append('usuario_id', user.usuario_id);
     } else {
-      console.error('Error al subir la imagen');
+      console.error('usuario_id is not available');
+      // Maneja el caso donde usuario_id no esté disponible
+      return;
     }
-  } catch (error) {
-    console.error('Error en la solicitud:', error);
+    
+     // Verifica el contenido de FormData
+     for (let pair of formData.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+
+    try {
+      const response = await axios.put('/users/update-user-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Solo es necesario incluir este header, el token se maneja en axiosConfig.ts
+          'Authorization':`Bearer ${localStorage.getItem('token')}`
+        },
+      });
+
+      const newAvatarUrl = response.data.avatar; // Suponiendo que el backend devuelve la URL del nuevo avatar
+
+      // Actualiza la imagen del usuario en el frontend con la respuesta del backend
+      setUser((prevUser) => {
+        if (!prevUser) return null;
+
+        return {
+          ...prevUser,
+          avatar: newAvatarUrl, // Asigna la nueva URL del avatar
+        };
+      });
+      
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+    }
   }
 };
+
+
   return (
     <>
       <Breadcrumb pageName="Profile" />
@@ -122,6 +147,7 @@ const handleImageUpload = async () => {
                   name="profile"
                   id="profile"
                   className="sr-only"
+                  onChange={handleProfileChange}
                 />
               </label>
             </div>

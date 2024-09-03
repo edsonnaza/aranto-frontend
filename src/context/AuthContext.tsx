@@ -21,6 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   error:string | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,9 +48,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post(`${URL}/login`, { email, password });
-      const { accessToken, user } = response.data;
+      const { refreshToken, user } = response.data;
       //console.log('user en AuthContext', user)
-      localStorage.setItem('token', accessToken);
+      localStorage.setItem('token', refreshToken);
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user); // Ajusta esto según lo que devuelva tu API
       
@@ -71,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login,logout}}>
+    <AuthContext.Provider value={{ user, setUser, loading, error, login,logout}}>
       {children}
     </AuthContext.Provider>
   );
