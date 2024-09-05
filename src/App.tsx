@@ -19,6 +19,7 @@ import DefaultLayout from './layout/DefaultLayout';
 import NotFound from './pages/NotFound';
 import LoginPage from './pages/Authentication/SignIn'; // Asegúrate de que esta importación esté correcta
 import { useAuth } from './context/AuthContext';
+import PacientesAdmitidos from './components/Reception/PacientesAdmitidos';
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -64,6 +65,15 @@ function App() {
             <>
               <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
               <Calendar />
+            </>
+          }
+        />
+         <Route
+          path="/recepcion"
+          element={
+            <>
+              <PageTitle title="Recepción | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+              <PacientesAdmitidos />
             </>
           }
         />

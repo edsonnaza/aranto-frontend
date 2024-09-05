@@ -70,7 +70,7 @@ const DropdownUser = () => {
                     fill=""
                   />
                 </svg>
-                My Profile
+                Mi Profile
               </Link>
             </li>
             <li>
