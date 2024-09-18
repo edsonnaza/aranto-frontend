@@ -1,4 +1,4 @@
-import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+ 
  
 import TablePacientesAdmitidos from '../Tables/TablePacientesAdmitidos';
  

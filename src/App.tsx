@@ -3,7 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-import SignIn from './pages/Authentication/SignIn';
+ 
 import SignUp from './pages/Authentication/SignUp';
 import Calendar from './pages/Calendar';
 import Chart from './pages/Chart';
@@ -11,7 +11,7 @@ import ECommerce from './pages/Dashboard/ECommerce';
 import FormElements from './pages/Form/FormElements';
 import FormLayout from './pages/Form/FormLayout';
 import Profile from './pages/Profile';
-import Settings from './pages/Settings';
+import UserSettings from './pages/UserSettings';
 import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
@@ -40,14 +40,21 @@ function App() {
     return <Loader />;
   }
 
-  // Si el usuario no está autenticado, redirigir al login
-  if (!user) {
-    return <LoginPage/>
-  }
+   // Si el usuario no está autenticado y no está en las rutas públicas (login o signup), redirigir al login
+   const isAuthRoute = pathname === '/auth/signup' || pathname === '/auth/signin';
+   
+   if(pathname==='/auth/signup'){ return <SignUp />}
+   if (!user && !isAuthRoute) {
+     return <LoginPage />;
+   }
   return (
     <DefaultLayout>
-      <Routes>
-        <Route path="/login" element={<SignIn />} />
+
+<Routes>
+        {/* Rutas de autenticación (públicas) */}
+        
+
+        {/* Rutas protegidas */}
         
         <Route
           index
@@ -123,7 +130,7 @@ function App() {
           element={
             <>
               <PageTitle title="Settings | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Settings />
+              <UserSettings />
             </>
           }
         />
@@ -158,25 +165,7 @@ function App() {
           }
         />
 
-        <Route
-          path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <SignIn />
-            </>
-          }
-        />
-
-        <Route
-          path="/auth/signup"
-          element={
-            <>
-              <PageTitle title="Signup | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <SignUp />
-            </>
-          }
-        />
+        
 
         <Route path="*" element={<NotFound />} />
       </Routes>
