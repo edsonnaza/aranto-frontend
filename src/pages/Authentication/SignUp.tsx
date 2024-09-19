@@ -2,7 +2,7 @@ import React,{useState, useEffect} from 'react';
 import axios from 'axios'; 
 import  user  from '../../types/user';
 import { useNavigate } from 'react-router-dom';
-
+import Swal from 'sweetalert2';
 
 const URL = import.meta.env.VITE_LOCALURL_BACKEND;
 
@@ -105,38 +105,80 @@ const SignUp: React.FC = () => {
     }, [inputEntry])
 
 
+    // Asegúrate de tener SweetAlert2 instalado e importado
+
     const saveData = async (
       event: React.FormEvent<HTMLFormElement>,
       inputEntry: user
     ) => {
-      // Prevenir el comportamiento por defecto del formulario
       event.preventDefault();
     
       Object.entries(inputEntry).forEach(([name, value]) => {
-        checkInputEntry(name, value as string); // Forzamos a TypeScript a tratarlo como string
+        checkInputEntry(name, value as string);
       });
     
-      // Si hay errores o campos vacíos, no procedemos
       if (Object.keys(inputError).length > 0) {
         console.log('Errores en la validación:', inputError);
-        return; // No procedemos si hay errores
+        return;
       }
     
-      // Si no hay errores, continuamos con la solicitud POST
+      // SweetAlert para "Enviando datos"
+      let timerInterval: any;
+      Swal.fire({
+        title: "Enviando datos...",
+        html: "Por favor espera mientras procesamos tu solicitud.",
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+    
       try {
-        console.log('sending data...',inputEntry)
-        const response = await axios.post(`${URL}/user`, inputEntry );
+        // Realiza la solicitud POST
+        const response = await axios.post(`${URL}/user`, inputEntry);
+    
         if (response.status === 201) {
-          console.log('Registro exitoso:', response.data.message);
-          alert('Usuario registrado con éxito');
-          navigate('/');
-
-          // Aquí puedes redirigir al usuario, mostrar un mensaje en pantalla, etc.
+          Swal.fire({
+            title: "Datos registrados correctamente",
+            html: "Serás redireccionado en <b></b> segundos.",
+            icon: "success",
+            timer: 3000, // Redirige en 3 segundos
+            timerProgressBar: true,
+            didOpen: () => {
+              Swal.showLoading();
+              
+              // Obtener el popup y verificar que no sea null
+              const popup = Swal.getPopup();
+              if (popup) {
+                const timer = popup.querySelector("b"); // Ahora popup no es null
+                timerInterval = setInterval(() => {
+                  // Verificar si Swal.getTimerLeft() devuelve un número y no undefined
+                  const timeLeft = Swal.getTimerLeft();
+                  if (timeLeft !== undefined && timer) {
+                    timer.textContent = `${Math.ceil(timeLeft / 1000)}`; // Mostrar el tiempo restante en segundos
+                  }
+                }, 1000);
+              }
+            },
+            willClose: () => {
+              clearInterval(timerInterval);
+            }
+          }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+              navigate('/login'); // Redirige al usuario a la página de login
+            }
+          });
         }
       } catch (error: any) {
-        console.error(error);
+        Swal.fire({
+          title: "Error",
+          text: "Ocurrió un error al registrar los datos. Por favor, intenta nuevamente.",
+          icon: "error"
+        });
+        console.error("Error al enviar los datos:", error);
       }
     };
+    
     
     
   return (
