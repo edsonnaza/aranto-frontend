@@ -1,11 +1,11 @@
  
  
-import { useAuth } from '../context/AuthContext';
+ 
 import axios from 'axios';
 //import { useState } from 'react';
-const UserSettings = () => {
-  const {user, setUser} = useAuth()
-  //const [profileImage, setProfileImage] = useState(user?.avatar);
+const PacientesForm = () => {
+ 
+  //const [profileImage, setProfileImage] = useState(paciente?.avatar);
  
 
 const handleAvatarUpdate = async (event: any) => {
@@ -25,9 +25,9 @@ const handleAvatarUpdate = async (event: any) => {
     const formData = new FormData();
     formData.append('avatar', file);
     
-    // Verifica que user y usuario_id existan y conviértelos a cadena
-    if (user?.usuario_id) {
-      formData.append('usuario_id', user.usuario_id);
+    // Verifica que paciente y usuario_id existan y conviértelos a cadena
+    if (paciente?.usuario_id) {
+      formData.append('usuario_id', paciente?.usuario_id);
     } else {
       console.error('usuario_id is not available');
       // Maneja el caso donde usuario_id no esté disponible
@@ -41,7 +41,7 @@ const handleAvatarUpdate = async (event: any) => {
 
 
     try {
-      const response = await axios.put('/users/update-user-avatar', formData, {
+      const response = await axios.put('/users/update-paciente-avatar', formData, {
         headers: {
           'Content-Type': 'multipart/form-data', // Solo es necesario incluir este header, el token se maneja en axiosConfig.ts
           'Authorization':`Bearer ${localStorage.getItem('token')}`
@@ -75,7 +75,7 @@ const handleAvatarUpdate = async (event: any) => {
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
                 <h3 className="font-medium text-black dark:text-white">
-                  Informacion del Usuario {user?.user_name}
+                  Informacion del Paciente {paciente?.nombre}
                 </h3>
               </div>
               <div className="p-7">
@@ -83,10 +83,10 @@ const handleAvatarUpdate = async (event: any) => {
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
                     <div className="w-full sm:w-1/2">
                       <label
-                        className="mb-3 block text-lg font-medium text-black dark:text-white"
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="fullName"
                       >
-                        Nombre
+                        Nombres
                       </label>
                       <div className="relative">
                         <span className="absolute left-4.5 top-4">
@@ -120,8 +120,8 @@ const handleAvatarUpdate = async (event: any) => {
                           name="fullName"
                           id="fullName"
                           placeholder="Devid Jhon"
-                          defaultValue={user?.user_name}
-                          value={user?.user_name}
+                          defaultValue={paciente?.nombres}
+                          value={paciente?.nombres}
 
                         />
                       </div>
@@ -165,8 +165,8 @@ const handleAvatarUpdate = async (event: any) => {
                           name="lastName"
                           id="LastName"
                           placeholder="Devid Jhon"
-                          defaultValue={user?.user_lastname}
-                          value={user?.user_lastname}
+                          defaultValue={paciente?.apellidos}
+                          value={paciente?.apellidos}
                         />
                       </div>
                     </div>
@@ -227,7 +227,7 @@ const handleAvatarUpdate = async (event: any) => {
                         name="emailAddress"
                         id="emailAddress"
                         placeholder="devidjond45@gmail.com"
-                        defaultValue={user?.email}
+                        defaultValue={paciente?.email}
                      
                       />
                     </div>
@@ -238,7 +238,7 @@ const handleAvatarUpdate = async (event: any) => {
                       className="mb-3 block text-sm font-medium text-black dark:text-white"
                       htmlFor="Username"
                     >
-                      Usuario login del sistema
+                      Registrar Paciente nuevo
                     </label>
                     <input
                       className="w-full rounded border border-stroke bg-gray py-3 px-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
@@ -246,8 +246,8 @@ const handleAvatarUpdate = async (event: any) => {
                       name="Username"
                       id="Username"
                       placeholder="devidjhon24"
-                      defaultValue={user?.email}
-                      value={user?.email}
+                      defaultValue={paciente?.email}
+                      value={paciente?.email}
                       readOnly
                     />
                   </div>
@@ -331,7 +331,7 @@ const handleAvatarUpdate = async (event: any) => {
                 <form action="#">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="h-14 w-14 rounded-full">
-                      <img src={user?.avatar} alt="User" />
+                      <img src={paciente?.avatar} alt="User" />
                     </div>
                     <div>
                       <span className="mb-1.5 text-black dark:text-white">
@@ -423,4 +423,4 @@ const handleAvatarUpdate = async (event: any) => {
   );
 };
 
-export default UserSettings;
+export default PacientesForm;

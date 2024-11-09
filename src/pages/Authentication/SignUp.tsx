@@ -29,9 +29,10 @@ const SignUp: React.FC = () => {
       ...prev,
       [name]: value,
     }));
-  
+    console.log(inputEntry)
     // Llamar a la validación inmediata mientras el usuario escribe
     checkInputEntry(name, value);
+
     };
 
     

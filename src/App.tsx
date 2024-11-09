@@ -20,7 +20,8 @@ import NotFound from './pages/NotFound';
 import LoginPage from './pages/Authentication/SignIn';
 import { useAuth } from './context/AuthContext';
 import PacientesAdmitidos from './components/Reception/PacientesAdmitidos';
-
+import SeguroMedicoTable from './components/Catastros/SeguroMedico/SeguroMedicoTable';
+import SeguroMedico from './components/Catastros/SeguroMedico/SeguroMedico';
 function App() {
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
@@ -77,10 +78,31 @@ function App() {
               }
             />
             <Route
+              path="/seguromedico"
+              element={
+                <>
+                  <PageTitle title="Seguro Medico" />
+                  <SeguroMedicoTable />
+                </>
+              }
+            />
+            <Route
               path="/recepcion"
               element={
                 <>
-                  <PageTitle title="Recepción | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                  <PageTitle title="Recepción" />
+                  <PacientesAdmitidos />
+                </>
+              }
+            />
+            <Route path="/seguromedico/nuevo" element={<SeguroMedico />} />
+            <Route path="/seguromedico/editar/:id" element={<SeguroMedico />} />
+            <Route path="/seguromedico/:id/delete-logico" element={<SeguroMedico />} />
+            <Route
+              path="/pacientes"
+              element={
+                <>
+                  <PageTitle title="Pacientes" />
                   <PacientesAdmitidos />
                 </>
               }
