@@ -22,6 +22,8 @@ import { useAuth } from './context/AuthContext';
 import PacientesAdmitidos from './components/Reception/PacientesAdmitidos';
 import SeguroMedicoTable from './components/Catastros/SeguroMedico/SeguroMedicoTable';
 import SeguroMedico from './components/Catastros/SeguroMedico/SeguroMedico';
+import PacientesForm from './components/Catastros/Pacientes/PacientesForm';
+import PacientesTable from './components/Catastros/Pacientes/PacientesTable';
 function App() {
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState<boolean>(true);
@@ -98,6 +100,8 @@ function App() {
             <Route path="/seguromedico/nuevo" element={<SeguroMedico />} />
             <Route path="/seguromedico/editar/:id" element={<SeguroMedico />} />
             <Route path="/seguromedico/:id/delete-logico" element={<SeguroMedico />} />
+            <Route path="/pacientes/" element={<PacientesTable />} />
+            <Route path="/pacientes/nuevo" element={<PacientesForm />} />
             <Route
               path="/pacientes"
               element={
@@ -120,7 +124,7 @@ function App() {
               path="/forms/form-elements"
               element={
                 <>
-                  <PageTitle title="Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                  <PageTitle title="Form Elements | " />
                   <FormElements />
                 </>
               }
