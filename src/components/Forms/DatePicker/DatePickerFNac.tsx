@@ -1,14 +1,21 @@
 import flatpickr from 'flatpickr';
+import { Spanish } from "flatpickr/dist/l10n/es.js"
+ 
 import { useEffect } from 'react';
+// Define la interfaz de los props
+interface Props {
+  onHandlerInput: (event: React.ChangeEvent<HTMLInputElement>) => void; // Cambiar HTMLSelectElement por HTMLInputElement
+}
 
-const DatePickerOne = () => {
+const DatePickerFNac : React.FC <Props>  = ({onHandlerInput}) => {
   useEffect(() => {
     // Init flatpickr
     flatpickr('.form-datepicker', {
       mode: 'single',
       static: true,
       monthSelectorType: 'static',
-      dateFormat: 'M j, Y',
+      dateFormat: "d/m/Y",
+      "locale": Spanish,
       prevArrow:
         '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
       nextArrow:
@@ -19,15 +26,17 @@ const DatePickerOne = () => {
   }, []);
 
   return (
-    <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-        Date picker
+    <div className='mb-1'>
+   <label className="mb-2.5 block text-black dark:text-white">
+        Fecha Nacimiento
       </label>
       <div className="relative">
         <input
           className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-          placeholder="mm/dd/yyyy"
+          placeholder="dd/mm/yyyy"
           data-class="flatpickr-right"
+          name='fechaNacimiento'
+          onChange={onHandlerInput}
         />
 
         <div className="pointer-events-none absolute inset-0 left-auto right-5 flex items-center">
@@ -49,4 +58,4 @@ const DatePickerOne = () => {
   );
 };
 
-export default DatePickerOne;
+export default DatePickerFNac;

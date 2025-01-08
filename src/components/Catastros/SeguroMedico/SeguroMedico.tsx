@@ -7,7 +7,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 const URL = import.meta.env.VITE_LOCALURL_BACKEND;
 
 // Valor inicial vacío
-const initInput = { 'seguromedico_nombre': '', 'descripcion': '', activo: true };
+const initInput: SegurosMedicosType = {
+  seguromedico_id: '',
+  seguromedico_nombre: '',
+  descripcion: '',
+  activo: true,
+};
 
 const SeguroMedico: React.FC = () => {
   const [inputEntry, setInputEntry] = useState<SegurosMedicosType>(initInput);
@@ -67,7 +72,7 @@ const SeguroMedico: React.FC = () => {
     event.preventDefault();
 
     Object.entries(inputEntry).forEach(([name, value]) => {
-      checkInputEntry(name, value as string);
+      checkInputEntry(name, value as any);
     });
 
     if (Object.keys(inputError).length > 0) {

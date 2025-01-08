@@ -22,7 +22,7 @@ import { useAuth } from './context/AuthContext';
 import PacientesAdmitidos from './components/Reception/PacientesAdmitidos';
 import SeguroMedicoTable from './components/Catastros/SeguroMedico/SeguroMedicoTable';
 import SeguroMedico from './components/Catastros/SeguroMedico/SeguroMedico';
-import PacientesForm from './components/Catastros/Pacientes/PacientesForm';
+import PacientesForm from './components/Catastros/Pacientes/PacienteNuevoForm';
 import PacientesTable from './components/Catastros/Pacientes/PacientesTable';
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -65,7 +65,7 @@ function App() {
               index
               element={
                 <>
-                  <PageTitle title="eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+                  <PageTitle title="Aranto - Sistema Médico Integral" />
                   <ECommerce />
                 </>
               }
@@ -83,7 +83,7 @@ function App() {
               path="/seguromedico"
               element={
                 <>
-                  <PageTitle title="Seguro Medico" />
+                  <PageTitle title="Seguro Médico" />
                   <SeguroMedicoTable />
                 </>
               }
