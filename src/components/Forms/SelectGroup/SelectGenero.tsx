@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 // Define la interfaz de los props
 interface Props {
   onHandlerInput: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onError:boolean;
 }
 
-const SelectGenero: React.FC <Props>  = ({onHandlerInput}) => {
+const SelectGenero: React.FC <Props>  = ({onHandlerInput,onError}) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -59,7 +60,7 @@ const SelectGenero: React.FC <Props>  = ({onHandlerInput}) => {
             onHandlerInput(e);
             
           }}
-          className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
+          className={`${onError ? 'border-danger dark:border-red-200' : 'border-stroke dark:border-form-strokedark'}  relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
             isOptionSelected ? 'text-black dark:text-white' : ''
           }`}
         >

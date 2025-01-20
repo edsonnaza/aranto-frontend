@@ -1,42 +1,53 @@
 import flatpickr from 'flatpickr';
-import { Spanish } from "flatpickr/dist/l10n/es.js"
- 
-import { useEffect } from 'react';
+import { Spanish } from "flatpickr/dist/l10n/es.js";
+import { useEffect, useRef } from 'react';
+
 // Define la interfaz de los props
 interface Props {
   onHandlerInput: (event: React.ChangeEvent<HTMLInputElement>) => void; // Cambiar HTMLSelectElement por HTMLInputElement
+  onError: boolean;
 }
 
-const DatePickerFNac : React.FC <Props>  = ({onHandlerInput}) => {
-  useEffect(() => {
-    // Init flatpickr
-    flatpickr('.form-datepicker', {
-      mode: 'single',
-      static: true,
-      monthSelectorType: 'static',
-      dateFormat: "d/m/Y",
-      "locale": Spanish,
-      prevArrow:
-        '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
-      nextArrow:
-        '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
-    });
+const DatePickerFNac: React.FC<Props> = ({ onHandlerInput, onError }) => {
+ 
+  const datePickerRef = useRef<HTMLInputElement>(null);
 
-    
-  }, []);
+  useEffect(() => {
+    if (datePickerRef.current) {
+      flatpickr(datePickerRef.current, {
+        locale: Spanish,
+        dateFormat: 'Y-m-d',
+        onChange: (selectedDates, dateStr) => {
+         // console.log({selectedDates})
+          if (datePickerRef.current) {
+            // Crear un evento simulado
+            const event = {
+              target: {
+                name: 'fechaNacimiento', // Nombre del campo
+                value: dateStr, // Valor seleccionado
+              },
+            } as React.ChangeEvent<HTMLInputElement>;
+            onHandlerInput(event); // Pasar el evento al componente padre
+          }
+        },
+      });
+    }
+  }, [onHandlerInput]);
 
   return (
-    <div className='mb-1'>
-   <label className="mb-2.5 block text-black dark:text-white">
+    <div className="mb-1">
+      <label className="mb-2.5 block text-black dark:text-white">
         Fecha Nacimiento
       </label>
       <div className="relative">
         <input
-          className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+         ref={datePickerRef}
+          className={`form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition ${onError ? 'border-red-300 dark:border-red-200' : 'border-stroke dark:border-form-strokedark'}  focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary`}
           placeholder="dd/mm/yyyy"
           data-class="flatpickr-right"
-          name='fechaNacimiento'
+          name="fechaNacimiento"
           onChange={onHandlerInput}
+          
         />
 
         <div className="pointer-events-none absolute inset-0 left-auto right-5 flex items-center">

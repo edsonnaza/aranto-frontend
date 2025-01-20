@@ -35,6 +35,7 @@ function App() {
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
+    
   }, []);
 
   if (loading || authLoading) {
@@ -43,7 +44,7 @@ function App() {
 
   // Rutas de autenticación (signup y signin) se renderizan sin layout
   const isAuthRoute = pathname === '/auth/signup' || pathname === '/auth/signin';
-
+   console.log('App:',{user})
   if (!user && !isAuthRoute) {
     return <LoginPage />;
   }

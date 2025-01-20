@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
- 
+import inputClass from '../../Catastros/Pacientes/getInputClassName';
+
 // Define la interfaz de los props
 interface Props {
-  onHandlerInput: (event: React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>) => void;
+  onHandlerInput: (
+    event:
+      | React.ChangeEvent<HTMLSelectElement>
+      | React.ChangeEvent<HTMLInputElement>,
+  ) => void;
   onErrorTipoDocumento: string | ((errorMessage: string) => void);
+  onError: boolean;
 }
 
-
-
-const SelectGenero: React.FC <Props>  = ({onHandlerInput,onErrorTipoDocumento}) => {
+const SelectGenero: React.FC<Props> = ({
+  onHandlerInput,
+  onErrorTipoDocumento,
+  onError,
+}) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -17,9 +25,9 @@ const SelectGenero: React.FC <Props>  = ({onHandlerInput,onErrorTipoDocumento}) 
   };
 
   return (
-    <div className='mb-1'>
+    <div className="mb-1">
       <label className="mb-2.5 block text-black dark:text-white">
-         Tipo Documento
+        Tipo Documento
       </label>
 
       <div className="relative z-20 bg-white dark:bg-form-input mb-1">
@@ -55,21 +63,28 @@ const SelectGenero: React.FC <Props>  = ({onHandlerInput,onErrorTipoDocumento}) 
         </span>
 
         <select
-        name='tipo_documento'
+          name="tipo_documento"
           value={selectedOption}
           onChange={(e) => {
             setSelectedOption(e.target.value);
             changeTextColor();
             onHandlerInput(e);
           }}
-          className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
+          className={`${
+            onError
+              ? 'border-danger dark:border-red-200'
+              : 'border-stroke dark:border-form-strokedark'
+          }  relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
             isOptionSelected ? 'text-black dark:text-white' : ''
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
             Seleccionar Tipo Documento
           </option>
-          <option value="Hombre" className="text-body dark:text-bodydark">
+          <option
+            value="Cédula de Identidad"
+            className="text-body dark:text-bodydark"
+          >
             Cédula de Identidad
           </option>
           <option value="Pasaporte" className="text-body dark:text-bodydark">
@@ -81,7 +96,6 @@ const SelectGenero: React.FC <Props>  = ({onHandlerInput,onErrorTipoDocumento}) 
           <option value="Otros" className="text-body dark:text-bodydark">
             Otros
           </option>
-          
         </select>
 
         <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
@@ -102,24 +116,27 @@ const SelectGenero: React.FC <Props>  = ({onHandlerInput,onErrorTipoDocumento}) 
             </g>
           </svg>
         </span>
-        
-                   
       </div>
-      {onErrorTipoDocumento && <p className='font-semibold text-red-500 mb-2'>{onErrorTipoDocumento.toString()}</p>}
+      {onErrorTipoDocumento && (
+        <p className="font-normal text-red-500 mb-2">
+          {onErrorTipoDocumento.toString()}
+        </p>
+      )}
 
-       <div className="mb-1 w-full xl:w-2/2">
-          <label className="mb-2.5 block text-black dark:text-white">
-            Documento Número
-          </label>
-          <input
-            name="documento_numero"
-            type="text"
-            placeholder="Escribir número"
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            onChange={onHandlerInput}
-            autoComplete='false'
-         />
-        </div>
+      <div className="mb-1 w-full xl:w-2/2">
+        <label className="mb-2.5 block text-black dark:text-white">
+          Documento Número
+        </label>
+        <input
+          name="documento_numero"
+          type="text"
+          placeholder="Escribir número"
+          className={inputClass(onError)}
+          // className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          onChange={onHandlerInput}
+          autoComplete="false"
+        />
+      </div>
     </div>
   );
 };

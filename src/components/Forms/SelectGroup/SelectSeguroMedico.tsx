@@ -7,9 +7,10 @@ const URL = import.meta.env.VITE_LOCALURL_BACKEND;
 // Define la interfaz de los props
 interface Props {
   onHandlerInput: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onError: boolean; 
 }
 
-const SelectSeguroMedico: React.FC <Props>  = ({onHandlerInput}) => {
+const SelectSeguroMedico: React.FC <Props>  = ({onHandlerInput,onError}) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
   const [segurosData, setSegurosData] = useState<SegurosMedicosType[]>([]);
@@ -28,6 +29,7 @@ const SelectSeguroMedico: React.FC <Props>  = ({onHandlerInput}) => {
        
         
       } catch (error) {
+        console.log('error',{error})
         console.error('Error al cargar los datos:', error);
       }
     };
@@ -85,7 +87,7 @@ const SelectSeguroMedico: React.FC <Props>  = ({onHandlerInput}) => {
             changeTextColor();
             onHandlerInput(e);
           }}
-          className={`relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
+          className={ ` ${onError ? 'border-danger dark:border-red-200' : 'border-stroke dark:border-form-strokedark'}  relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
             isOptionSelected ? 'text-black dark:text-white' : ''
           }`}
         >

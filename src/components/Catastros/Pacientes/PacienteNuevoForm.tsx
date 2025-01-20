@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { useEffect, useState } from "react";
 import  inputClass  from './getInputClassName'
-
+const URL = import.meta.env.VITE_LOCALURL_BACKEND;
 // Valor inicial vacío
 const initInput:PacienteTypes = { 'paciente_id':'',
                     'nombres': '', 
@@ -31,6 +31,7 @@ const PacienteNuevoForm = ()=>{
     const [inputEntry, setInputEntry] = useState<PacienteTypes>(initInput);
     const [inputError, setInputError] = useState<{ [key: string]: string }>({});
     const [editMode, setEditMode] = useState(false); // Estado para determinar si es edición
+    const [formIsValid, setFormIsValid] = useState(false);
 
         // Verifica los inputs
         const handlerInput = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -43,8 +44,8 @@ const PacienteNuevoForm = ()=>{
         }
 
         // Verifica las entradas para el error a mostrar en el form
-        const checkInputEntry = (name: string, value: string) => {
-            console.log({name,value})
+        const checkInputEntry = async (name: string, value: string) => {
+            
             setInputError((prev) => {
             const newErrors = { ...prev };
             if (name === 'nombres') {
@@ -84,7 +85,8 @@ const PacienteNuevoForm = ()=>{
             }
 
             if (name === 'fechaNacimiento') {
-                if (value==='' ) {
+                console.log({'fechaNacimiento':value})
+                if (value.length===0 ) {
                 newErrors.fechaNacimiento = 'Debe seleccionar una fecha de nacimiento.';
                 } else {
                 delete newErrors.fechaNacimiento;
@@ -92,17 +94,25 @@ const PacienteNuevoForm = ()=>{
             }
             if (name === 'seguromedico_id') {
                 if (value==='' ) {
+                
                 newErrors.seguromedico_id = 'Debe seleccionar un seguro.';
                 } else {
                 delete newErrors.seguromedico_id;
                 }
             }
-            console.log(newErrors)
+
+              // Si hay errores, no hacer nada
+               setFormIsValid(true);
+                if (Object.keys(newErrors).length > 0) {
+                    setFormIsValid(false)
+                    console.log({Error: "Check entry: There is data empty" });
+                   // return; // Detener la ejecución sin mostrar alertas ni hacer el POST
+                }
+      
             return newErrors;
             });
         }
-    
-    
+     
 
        // Cargar datos si es modo edición
         useEffect(() => {
@@ -130,58 +140,66 @@ const PacienteNuevoForm = ()=>{
 
         const saveData = async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
-
-            Object.entries(inputEntry).forEach(([name, value]) => {
-            checkInputEntry(name, value as any);
-            });
-
-            if (Object.keys(inputError).length > 0) {
-            return;
+            console.log({ Saving: "Saving data...", inputEntry });
+        
+            // Validar inputs de forma secuencial
+            for (const [name, value] of Object.entries(inputEntry)) {
+                await checkInputEntry(name, value as any); // Asegúrate de que esta función sea asíncrona
             }
-
+        
+            // Si hay errores, no hacer nada
+            if (Object.keys(inputError).length > 0 || !formIsValid) {
+                console.log({ inputError, Error: "There is data empty" });
+                return; // Detener la ejecución sin mostrar alertas ni hacer el POST
+            }
+        
+            // Mostrar mensaje de carga
             Swal.fire({
-            title: "Enviando datos...",
-            html: "Por favor espera mientras procesamos tu solicitud.",
-            timerProgressBar: true,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-            });
-
-            try {
-            const token = localStorage.getItem('token');
-            const response = editMode
-                ? await axios.put(`${URL}/pacientes/${id}`, inputEntry, {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                : await axios.post(`${URL}/pacientes`, inputEntry, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-            if (response.status === (editMode ? 200 : 201)) {
-                Swal.fire({
-                title: "Datos registrados correctamente",
-                html: "Serás redireccionado en <b></b> segundos.",
-                icon: "success",
-                timer: 3000,
+                title: "Enviando datos...",
+                html: "Por favor espera mientras guardamos tus datos.",
                 timerProgressBar: true,
                 didOpen: () => {
                     Swal.showLoading();
+                },
+            });
+        
+            try {
+                const token = localStorage.getItem('token');
+                const response = editMode
+                    ? await axios.put(`${URL}/pacientes/${id}`, inputEntry, {
+                          headers: { Authorization: `Bearer ${token}` },
+                      })
+                    : await axios.post(`${URL}/pacientes`, inputEntry, {
+                          headers: { Authorization: `Bearer ${token}` },
+                      });
+        
+                // Manejar respuesta exitosa
+                if (response.status === (editMode ? 200 : 201)) {
+                    Swal.fire({
+                        title: "Datos registrados correctamente",
+                        html: "Serás redireccionado en <b></b> segundos.",
+                        icon: "success",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    }).then((result) => {
+                        if (result.dismiss === Swal.DismissReason.timer) {
+                            navigate('/pacientes');
+                        }
+                    });
                 }
-                }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                    navigate('/seguromedico');
-                }
+            } catch (error) {
+                // Manejar error del servidor
+                Swal.fire({
+                    title: "Error",
+                    text: "Ocurrió un error al registrar los datos. Por favor, intenta nuevamente.",
+                    icon: "error",
                 });
             }
-            } catch (error) {
-            Swal.fire({
-                title: "Error",
-                text: "Ocurrió un error al registrar los datos. Por favor, intenta nuevamente.",
-                icon: "error"
-            });
-            }
         };
+        
 
     return <>
        
@@ -205,7 +223,7 @@ const PacienteNuevoForm = ()=>{
                       placeholder="Escribir nombres"
                       className={inputError?.nombres ? inputClass(true) : inputClass(false)}                      onChange={handlerInput}
                     />
-                       {inputError.nombres && <p className='font-semibold text-red-500'>{inputError.nombres}</p>}
+                       {inputError.nombres && <p className='font-normal text-red-500'>{inputError.nombres}</p>}
                   </div>
 
                   <div className="w-full xl:w-1/2">
@@ -219,31 +237,39 @@ const PacienteNuevoForm = ()=>{
                       className={inputError?.apellidos ? inputClass(true) : inputClass(false)}
                       onChange={handlerInput}
                   />
-                  {inputError.apellidos && <p className='font-semibold text-red-500 dark:text-red-200'>{inputError.apellidos}</p>}
+                  {inputError.apellidos && <p className='font-normal text-red-500 dark:text-red-200'>{inputError.apellidos}</p>}
                   </div>
                 </div>
                 <div className="mb-1 flex flex-col xl:flex-row gap-6 w-full">
                     <div className="flex-1">
                         <SelectTipoDocumento 
                         onErrorTipoDocumento={inputError?.tipo_documento? inputError.tipo_documento : ''} 
-                        onHandlerInput={handlerInput}/>
+                        onHandlerInput={handlerInput}
+                        onError={inputError?.tipo_documento ? true : false}
+                        />
                         
-                        {inputError.documento_numero && <p className='font-semibold text-red-500 '>{inputError.documento_numero}</p>}
+                        {inputError.documento_numero && <p className='font-normal text-red-500 '>{inputError.documento_numero}</p>}
             
                     </div>
                     <div className="flex-1">
-                        <SelectGenero onHandlerInput={handlerInput} />
-                        {inputError.genero && <p className='font-semibold text-red-500'>{inputError.genero}</p>}
+                        <SelectGenero 
+                        onError={inputError?.genero? true : false} 
+                        onHandlerInput={handlerInput} />
+                        {inputError.genero && <p className='font-normal text-red-500'>{inputError.genero}</p>}
            
                     </div>
                     <div className="flex-1">
-                        <DatePickerFNac onHandlerInput={handlerInput} />
-                        {inputError.fechaNacimiento && <p className='font-semibold text-red-500'>{inputError.fechaNacimiento}</p>}
+                        <DatePickerFNac 
+                        onError={inputError?.fechaNacimiento? true : false} 
+                        onHandlerInput={handlerInput} />
+                        {inputError.fechaNacimiento && <p className='font-normal text-red-500'>{inputError.fechaNacimiento}</p>}
            
                     </div>
                     <div className="flex-1">
-                        <SelectSeguroMedico onHandlerInput={handlerInput} />
-                        {inputError.seguromedico_id && <p className='font-semibold text-red-500 '>{inputError.seguromedico_id}</p>}
+                        <SelectSeguroMedico 
+                        onHandlerInput={handlerInput} 
+                        onError={inputError?.seguromedico_id? true : false} />
+                        {inputError.seguromedico_id && <p className='font-normal text-red-500 '>{inputError.seguromedico_id}</p>}
            
                     </div>
                    
